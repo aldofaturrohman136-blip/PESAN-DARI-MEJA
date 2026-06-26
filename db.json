@@ -1,0 +1,147 @@
+{
+  "menu": [
+    {
+      "id": "menu-001",
+      "nama": "Mie Ayam Spesial",
+      "kategori": "Makanan",
+      "harga": 28000,
+      "deskripsi": "Mie lembut dengan topping ayam cincang, bakso, dan pangsit goreng.",
+      "gambar": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=400&fit=crop",
+      "tersedia": true
+    },
+    {
+      "id": "menu-002",
+      "nama": "Ayam Bakar",
+      "kategori": "Makanan",
+      "harga": 45000,
+      "deskripsi": "Ayam bakar bumbu rempah khas Nusantara.",
+      "gambar": "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400&h=400&fit=crop",
+      "tersedia": true
+    },
+    {
+      "id": "menu-003",
+      "nama": "Es Teh Manis",
+      "kategori": "Minuman",
+      "harga": 8000,
+      "deskripsi": "Teh pilihan dengan gula asli, disajikan dingin.",
+      "gambar": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop",
+      "tersedia": true
+    },
+    {
+      "id": "menu-004",
+      "nama": "Nasi Goreng Spesial",
+      "kategori": "Makanan",
+      "harga": 35000,
+      "deskripsi": "Nasi goreng dengan telur mata sapi, ayam suwir, dan acar.",
+      "gambar": "https://images.unsplash.com/photo-1603133872878-684f208fb74b?w=400&h=400&fit=crop",
+      "tersedia": true
+    },
+    {
+      "id": "menu-005",
+      "nama": "Sate Ayam",
+      "kategori": "Makanan",
+      "harga": 32000,
+      "deskripsi": "Sate ayam 10 tusuk dengan bumbu kacang dan lontong.",
+      "gambar": "https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&h=400&fit=crop",
+      "tersedia": true
+    },
+    {
+      "id": "menu-006",
+      "nama": "Jus Jeruk",
+      "kategori": "Minuman",
+      "harga": 12000,
+      "deskripsi": "Jus jeruk segar tanpa gula tambahan.",
+      "gambar": "https://images.unsplash.com/photo-1613478223719-2ab802602423?w=400&h=400&fit=crop",
+      "tersedia": true
+    },
+    {
+      "id": "menu-007",
+      "nama": "Puding Coklat",
+      "kategori": "Dessert",
+      "harga": 15000,
+      "deskripsi": "Puding coklat lembut dengan vla vanila.",
+      "gambar": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&h=400&fit=crop",
+      "tersedia": true
+    }
+  ],
+  "orders": [
+    {
+      "id": "#0002",
+      "namaPelanggan": "Ahmad",
+      "meja": "5",
+      "items": [
+        {
+          "menuId": "menu-001",
+          "nama": "Mie Ayam Spesial",
+          "harga": 28000,
+          "jumlah": 2,
+          "catatan": ""
+        }
+      ],
+      "subtotal": 56000,
+      "ppn": 6160,
+      "total": 62160,
+      "catatan": "",
+      "pembayaran": "va",
+      "pembayaranStatus": "Menunggu",
+      "status": "Baru",
+      "waktu": "2026-06-26T08:03:26.905Z",
+      "vaNumber": "888002",
+      "selesaiWaktu": null,
+      "waktuBayar": null
+    },
+    {
+      "id": "#0001",
+      "namaPelanggan": "Ahmad",
+      "meja": "5",
+      "items": [
+        {
+          "menuId": "menu-001",
+          "nama": "Mie Ayam Spesial",
+          "harga": 28000,
+          "jumlah": 2,
+          "catatan": "Jangan pakai daun seledri"
+        }
+      ],
+      "subtotal": 56000,
+      "ppn": 6160,
+      "total": 62160,
+      "catatan": "",
+      "pembayaran": "tunai",
+      "pembayaranStatus": "Lunas",
+      "status": "Selesai",
+      "waktu": "2026-06-26T07:57:44.283Z",
+      "vaNumber": null,
+      "selesaiWaktu": "2026-06-26T07:59:23.481Z",
+      "waktuBayar": "2026-06-26T07:59:54.110Z"
+    }
+  ],
+  "settings": {
+    "restoInfo": {
+      "nama": "Resto Nusantara",
+      "alamat": "Jl. Sejahtera No. 10, Jakarta",
+      "telepon": "(021) 1234 5678",
+      "ppn": 11
+    },
+    "bankAccounts": [
+      {
+        "bank": "BCA",
+        "nomor": "1234567890",
+        "atasNama": "Resto Nusantara"
+      },
+      {
+        "bank": "Mandiri",
+        "nomor": "9876543210",
+        "atasNama": "Resto Nusantara"
+      },
+      {
+        "bank": "BNI",
+        "nomor": "4567890123",
+        "atasNama": "Resto Nusantara"
+      }
+    ],
+    "vaNumber": "888001",
+    "qrisUrl": ""
+  },
+  "orderCounter": 2
+}

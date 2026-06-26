@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keranjang - Resto Nusantara</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            color: #0D0D0D;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 0 100px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.4rem 1.2rem 1rem;
+            border-bottom: 0.5px solid #E8E8E8;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+        }
+
+        .page-header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #1A3A2A;
+            letter-spacing: 0.06em;
+        }
+
+        .back-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1.5px solid #1A3A2A;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #1A3A2A;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #1A3A2A;
+            color: white;
+        }
+
+        .cart-count {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #1A3A2A;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1A3A2A;
+            padding: 1.2rem 1.2rem 0.8rem;
+            letter-spacing: 0.04em;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1rem 1.2rem;
+            border-bottom: 0.5px solid #F0F0F0;
+        }
+
+        .cart-item-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .cart-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cart-item-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #0D0D0D;
+            margin-bottom: 2px;
+        }
+
+        .cart-item-desc {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cart-item-price {
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #1A3A2A;
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1.5px solid #1A3A2A;
+            background: #fff;
+            color: #1A3A2A;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .qty-btn:hover {
+            background: #1A3A2A;
+            color: #fff;
+        }
+
+        .qty-value {
+            font-weight: 500;
+            font-size: 0.9rem;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .delete-btn {
+            color: #ff4444;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 1.5rem 1.2rem;
+            margin: 1.2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            border: 0.5px solid #F0F0F0;
+        }
+
+        .card .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card .mb-1 {
+            margin-bottom: 0.6rem;
+        }
+
+        .card .mt-2 {
+            margin-top: 1.2rem;
+        }
+
+        .card span:first-child {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .card span:last-child {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .card .total-row {
+            border-top: 1.5px solid #1A3A2A;
+            padding-top: 1rem;
+            margin-top: 0.8rem;
+        }
+
+        .card .total-row span {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1A3A2A;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 0.5px solid #D8D8D8;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: #0D0D0D;
+            background: #F7F7F7;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #1A3A2A;
+            background: #fff;
+        }
+
+        .form-input::placeholder {
+            color: #aaa;
+        }
+
+        .btn-primary {
+            display: block;
+            width: 100%;
+            padding: 0.9rem;
+            background: #1A3A2A;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #0D1F17;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #888;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: #1A3A2A;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 1.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0D0D0D;
+            color: #fff;
+            padding: 0.6rem 1.4rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            opacity: 0;
+            transition: all 0.25s;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 100;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <button class="back-btn" onclick="history.back()">←</button>
+            <h1>Keranjang</h1>
+            <span class="cart-count" id="cart-count-header">0 item</span>
+        </div>
+
+        <div id="cart-items"></div>
+
+        <div class="card" id="cart-summary" style="margin-bottom: 80px;">
+            <div class="flex-between mb-1">
+                <span style="color: #888;">Catatan:</span>
+            </div>
+            <input type="text" class="form-input" id="catatan-pesanan" placeholder="Contoh: kurangi pedas, tanpa kecap..." style="margin-bottom: 18px;">
+
+            <div class="flex-between mb-1">
+                <span>Subtotal</span>
+                <span id="subtotal">Rp 0</span>
+            </div>
+            <div class="flex-between mb-1">
+                <span>PPN 11%</span>
+                <span id="ppn">Rp 0</span>
+            </div>
+            <div class="flex-between total-row">
+                <span>Total</span>
+                <span id="total">Rp 0</span>
+            </div>
+
+            <button class="btn-primary mt-2" onclick="goToCheckout()">Lanjut ke Checkout</button>
+        </div>
+
+        <div id="empty-cart" class="empty-state hidden">
+            <div class="empty-state-icon">🛒</div>
+            <h3>Keranjang Kosong</h3>
+            <p>Belum ada item di keranjang Anda</p>
+            <a href="beranda.html" class="btn-primary" style="display: inline-block; width: auto; padding: 0.75rem 2rem;">Lihat Menu</a>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../shared/store.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCart();
+        });
+
+        // PERBAIKAN: Support format lama (menuId+jumlah) dan baru (id+qty)
+        function normalizeCartItem(item) {
+            const menu = Store.getMenu();
+            const menuItem = menu.find(m => m.id === (item.id || item.menuId));
+
+            return {
+                id: item.id || item.menuId,
+                nama: item.nama || (menuItem ? menuItem.nama : 'Unknown'),
+                harga: item.harga || (menuItem ? menuItem.harga : 0),
+                gambar: item.gambar || (menuItem ? menuItem.gambar : ''),
+                qty: item.qty || item.jumlah || 1,
+                catatan: item.catatan || ''
+            };
+        }
+
+        function renderCart() {
+            const rawCart = Store.getCart();
+
+            if (rawCart.length === 0) {
+                document.getElementById('cart-items').classList.add('hidden');
+                document.getElementById('cart-summary').classList.add('hidden');
+                document.getElementById('empty-cart').classList.remove('hidden');
+                return;
+            }
+
+            // Normalize semua item ke format baru
+            const cart = rawCart.map(normalizeCartItem);
+
+            document.getElementById('cart-items').classList.remove('hidden');
+            document.getElementById('cart-summary').classList.remove('hidden');
+            document.getElementById('empty-cart').classList.add('hidden');
+
+            const cartItems = document.getElementById('cart-items');
+
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <img src="${item.gambar}" alt="${item.nama}" class="cart-item-img" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop'">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.nama}</div>
+                        ${item.catatan ? `<div class="cart-item-desc">${item.catatan}</div>` : ''}
+                        <div class="cart-item-price">${formatRupiah(item.harga * item.qty)}</div>
+                        <div class="delete-btn" onclick="removeItem('${item.id}')">Hapus</div>
+                    </div>
+                    <div class="qty-control">
+                        <button class="qty-btn" onclick="updateQty('${item.id}', -1)">−</button>
+                        <span class="qty-value">${item.qty}</span>
+                        <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateSummary(cart);
+        }
+
+        function updateQty(id, delta) {
+            const cart = Store.getCart();
+            const item = cart.find(c => (c.id || c.menuId) === id);
+
+            if (!item) return;
+
+            const currentQty = item.qty || item.jumlah || 1;
+            const newQty = currentQty + delta;
+
+            if (newQty <= 0) {
+                Store.removeFromCart(id);
+            } else {
+                Store.updateCartQty(id, newQty);
+            }
+
+            renderCart();
+        }
+
+        function removeItem(id) {
+            Store.removeFromCart(id);
+            renderCart();
+            showToast('Item dihapus');
+        }
+
+        function updateSummary(cart) {
+            const subtotal = cart.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+            const ppn = Math.round(subtotal * 0.11);
+            const total = subtotal + ppn;
+
+            document.getElementById('subtotal').textContent = formatRupiah(subtotal);
+            document.getElementById('ppn').textContent = formatRupiah(ppn);
+            document.getElementById('total').textContent = formatRupiah(total);
+            document.getElementById('cart-count-header').textContent = `${cart.reduce((s, i) => s + i.qty, 0)} item`;
+        }
+
+        function goToCheckout() {
+            const catatan = document.getElementById('catatan-pesanan').value;
+            if (catatan) localStorage.setItem('rn_catatan_pesanan', catatan);
+            window.location.href = 'checkout.html';
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>
