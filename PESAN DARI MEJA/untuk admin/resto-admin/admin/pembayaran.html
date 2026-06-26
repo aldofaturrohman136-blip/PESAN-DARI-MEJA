@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran - Resto Nusantara</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="admin-shell.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-brand">
+            <div class="brand-logo">
+                <svg width="24" height="24" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="22" cy="22" r="20" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
+                    <path d="M22 10 C22 10 29 15.5 29 22 C29 28.5 22 34 22 34 C22 34 15 28.5 15 22 C15 15.5 22 10 22 10Z"
+                          stroke="rgba(255,255,255,0.5)" stroke-width="1" fill="none"/>
+                    <line x1="10" y1="22" x2="34" y2="22" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/>
+                </svg>
+                <h2>Resto Nusantara</h2>
+            </div>
+            <p>Panel Admin</p>
+        </div>
+        <ul class="admin-nav">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="dapur.html">Antrian Dapur</a></li>
+            <li><a href="menu.html">Kelola Menu</a></li>
+            <li><a href="pembayaran.html" class="active">Pembayaran</a></li>
+        </ul>
+        <div class="admin-sidebar-footer">
+            <a href="../index.html" style="color: rgba(255,255,255,0.2); text-decoration: none; letter-spacing: 0.05em;">Keluar</a>
+        </div>
+    </aside>
+
+    <main class="admin-main">
+        <div class="admin-header">
+            <h1>Pembayaran</h1>
+        </div>
+
+        <div class="admin-content">
+            
+            <!-- Filter -->
+            <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+                <button class="filter-btn active" onclick="filterPesanan('Menunggu')">Menunggu Bayar</button>
+                <button class="filter-btn" onclick="filterPesanan('Lunas')">Sudah Lunas</button>
+            </div>
+
+            <!-- Daftar Pesanan -->
+            <div id="daftar-pesanan"></div>
+
+        </div>
+    </main>
+
+    <!-- Modal Konfirmasi -->
+    <div id="modal-konfirmasi" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                                       background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: #fff; width: 360px; border-radius: 12px; padding: 28px; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 12px;">💳</div>
+            <h3 style="margin-bottom: 8px;">Konfirmasi Pembayaran</h3>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 8px;">
+                Bayar pesanan <b id="konfirmasi-order"></b>?
+            </p>
+            <p style="font-size: 1.2rem; font-weight: 600; color: #1A3A2A; margin-bottom: 24px;" id="konfirmasi-total"></p>
+            <div style="display: flex; gap: 12px;">
+                <button onclick="batalBayar()" style="flex: 1; padding: 12px; background: #F0F0F0; color: #555; 
+                                                       border: none; border-radius: 8px; cursor: pointer; font-family: 'Inter';">
+                    Batal
+                </button>
+                <button onclick="konfirmasiBayar()" style="flex: 1; padding: 12px; background: #1A3A2A; color: #fff; 
+                                                            border: none; border-radius: 8px; cursor: pointer; font-family: 'Inter';">
+                    Bayar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Struk -->
+    <div id="modal-struk" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                                  background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: #fff; width: 400px; max-height: 90vh; overflow-y: auto; border-radius: 12px; padding: 32px; position: relative;">
+            <button onclick="tutupStruk()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; 
+                                                   font-size: 1.5rem; cursor: pointer; color: #999;">×</button>
+            
+            <div id="isi-struk" style="font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.6;"></div>
+            
+            <div style="margin-top: 24px; display: flex; gap: 12px;">
+                <button onclick="cetakStruk()" style="flex: 1; padding: 12px; background: #1A3A2A; color: #fff; 
+                                                       border: none; border-radius: 8px; cursor: pointer; font-family: 'Inter';">
+                    Cetak
+                </button>
+                <button onclick="tutupStruk()" style="flex: 1; padding: 12px; background: #F0F0F0; color: #555; 
+                                                       border: none; border-radius: 8px; cursor: pointer; font-family: 'Inter';">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .filter-btn {
+            padding: 7px 18px;
+            border-radius: 20px;
+            border: 0.5px solid #D8D8D8;
+            background: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-btn.active {
+            background: #1A3A2A;
+            border-color: #1A3A2A;
+            color: #fff;
+        }
+        .filter-btn:hover:not(.active) { background: #F0F0F0; }
+
+        .pesanan-card {
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            background: #fff;
+        }
+        .pesanan-card.lunas {
+            opacity: 0.7;
+            background: #F9F9F9;
+        }
+        
+        .struk-header {
+            text-align: center;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+        .struk-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+        .struk-total {
+            border-top: 1px dashed #ccc;
+            margin-top: 12px;
+            padding-top: 12px;
+            font-weight: bold;
+        }
+        
+        .btn-bayar {
+            width: 100%;
+            padding: 14px;
+            background: #1A3A2A;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter';
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .btn-bayar:hover { background: #2D5A4A; }
+        
+        .btn-struk {
+            width: 100%;
+            padding: 10px;
+            background: #F0F0F0;
+            color: #555;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter';
+            font-size: 0.85rem;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #modal-struk, #modal-struk * { visibility: visible; }
+            #modal-struk {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+            }
+            button { display: none !important; }
+        }
+    </style>
+
+    <script src="../shared/store.js"></script>
+    <script>
+        let filterAktif = 'Menunggu';
+        let pendingBayar = null;
+
+        function filterPesanan(status) {
+            filterAktif = status;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (status === 'Menunggu' && btn.textContent.includes('Menunggu')) ||
+                    (status === 'Lunas' && btn.textContent.includes('Lunas'))
+                );
+            });
+            renderPesanan();
+        }
+
+        function hitungPPN(total) {
+            const ppn = Store.getRestoInfo().ppn || 11;
+            return Math.round(total * ppn / 100);
+        }
+
+        function renderPesanan() {
+            let orders = Store.getOrders();
+            
+            if (filterAktif === 'Menunggu') {
+                orders = orders.filter(o => o.pembayaranStatus === 'Menunggu');
+            } else {
+                orders = orders.filter(o => o.pembayaranStatus === 'Lunas');
+            }
+
+            const container = document.getElementById('daftar-pesanan');
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: #bbb;">
+                        <p style="font-family: 'Inter', sans-serif; font-size: 0.875rem;">
+                            ${filterAktif === 'Menunggu' ? 'Tidak ada yang menunggu pembayaran' : 'Belum ada transaksi lunas'}
+                        </p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = orders.map(order => {
+                const subtotal = order.total || 0;
+                const ppn = hitungPPN(subtotal);
+                const totalAkhir = subtotal + ppn;
+                const sudahLunas = order.pembayaranStatus === 'Lunas';
+
+                const itemsHtml = order.items ? order.items.map(item => `
+                    <div class="struk-item">
+                        <span>${item.nama} x${item.jumlah}</span>
+                        <span>${formatRupiah(item.harga * item.jumlah)}</span>
+                    </div>
+                `).join('') : '';
+
+                return `
+                    <div class="pesanan-card ${sudahLunas ? 'lunas' : ''}">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div>
+                                <div style="font-weight: 600; font-size: 1.1rem;">${order.id}</div>
+                                <div style="color: #888; font-size: 0.85rem; margin-top: 4px;">
+                                    Meja ${order.meja || '-'} · ${order.namaPelanggan || 'Tanpa Nama'} · ${timeAgo(order.waktu)}
+                                </div>
+                            </div>
+                            <span style="padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 500;
+                                ${sudahLunas ? 'background: #E8F5E9; color: #388E3C;' : 'background: #FFF3E0; color: #E65100;'}">
+                                ${order.pembayaranStatus}
+                            </span>
+                        </div>
+
+                        <div style="background: #F9F9F9; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                            ${itemsHtml}
+                            <div class="struk-item" style="margin-top: 8px; border-top: 1px solid #E0E0E0; padding-top: 8px;">
+                                <span>Subtotal</span>
+                                <span>${formatRupiah(subtotal)}</span>
+                            </div>
+                            <div class="struk-item">
+                                <span>PPN (${Store.getRestoInfo().ppn}%)</span>
+                                <span>${formatRupiah(ppn)}</span>
+                            </div>
+                            <div class="struk-item struk-total">
+                                <span>TOTAL</span>
+                                <span style="font-size: 1.1rem;">${formatRupiah(totalAkhir)}</span>
+                            </div>
+                        </div>
+
+                        ${!sudahLunas ? `
+                            <button class="btn-bayar" onclick="tanyaBayar('${order.id}', ${totalAkhir})">Bayar</button>
+                        ` : `
+                            <div style="text-align: center; color: #388E3C; font-size: 0.85rem; margin-bottom: 12px;">
+                                ✓ Lunas · ${formatWaktu(order.waktuBayar || order.waktu)}
+                            </div>
+                            <button class="btn-struk" onclick="tampilkanStruk('${order.id}')">Lihat Struk</button>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==================== KONFIRMASI ====================
+        function tanyaBayar(orderId, total) {
+            pendingBayar = { orderId, total };
+            
+            document.getElementById('konfirmasi-order').textContent = orderId;
+            document.getElementById('konfirmasi-total').textContent = formatRupiah(total);
+            
+            document.getElementById('modal-konfirmasi').style.display = 'flex';
+        }
+
+        function batalBayar() {
+            pendingBayar = null;
+            document.getElementById('modal-konfirmasi').style.display = 'none';
+        }
+
+        function konfirmasiBayar() {
+            if (!pendingBayar) return;
+            
+            const { orderId, total } = pendingBayar;
+            
+            Store.updateOrderPembayaran(orderId, 'Lunas');
+            
+            const orders = Store.getOrders();
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.waktuBayar = new Date().toISOString();
+                order.totalAkhir = total;
+                localStorage.setItem(STORE_KEYS.ORDERS, JSON.stringify(orders));
+            }
+
+            document.getElementById('modal-konfirmasi').style.display = 'none';
+            pendingBayar = null;
+            
+            tampilkanStruk(orderId);
+            renderPesanan();
+        }
+
+        // ==================== STRUK ====================
+        function tampilkanStruk(orderId) {
+            const order = Store.getOrderById(orderId);
+            if (!order) return;
+
+            const subtotal = order.total || 0;
+            const ppn = hitungPPN(subtotal);
+            const totalAkhir = order.totalAkhir || (subtotal + ppn);
+            const info = Store.getRestoInfo();
+
+            const itemsHtml = order.items ? order.items.map(item => `
+                <div class="struk-item">
+                    <span>${item.nama}</span>
+                    <span>${item.jumlah} x ${formatRupiah(item.harga)}</span>
+                </div>
+                <div class="struk-item" style="margin-bottom: 4px;">
+                    <span></span>
+                    <span>${formatRupiah(item.harga * item.jumlah)}</span>
+                </div>
+            `).join('') : '';
+
+            document.getElementById('isi-struk').innerHTML = `
+                <div class="struk-header">
+                    <h2 style="margin: 0; font-size: 1.2rem;">${info.nama}</h2>
+                    <p style="margin: 4px 0; color: #666;">${info.alamat}</p>
+                    <p style="margin: 4px 0; color: #666;">Tel: ${info.telepon}</p>
+                    <p style="margin: 8px 0; font-size: 0.75rem; color: #999;">
+                        ${new Date(order.waktuBayar || order.waktu).toLocaleString('id-ID')}
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 12px;">
+                    <p>No: ${order.id}</p>
+                    <p>Meja: ${order.meja || '-'}</p>
+                    <p>Pelanggan: ${order.namaPelanggan || 'Tanpa Nama'}</p>
+                </div>
+
+                <div style="border-top: 1px dashed #ccc; padding-top: 12px;">
+                    ${itemsHtml}
+                </div>
+
+                <div class="struk-total">
+                    <div class="struk-item">
+                        <span>Subtotal</span>
+                        <span>${formatRupiah(subtotal)}</span>
+                    </div>
+                    <div class="struk-item">
+                        <span>PPN (${info.ppn}%)</span>
+                        <span>${formatRupiah(ppn)}</span>
+                    </div>
+                    <div class="struk-item" style="font-size: 1.1rem; margin-top: 8px;">
+                        <span>TOTAL</span>
+                        <span>${formatRupiah(totalAkhir)}</span>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px dashed #ccc; margin-top: 16px; padding-top: 12px; text-align: center;">
+                    <p style="margin-top: 16px; font-size: 0.75rem; color: #999;">
+                        Terima kasih telah berkunjung!<br>
+                        Selamat menikmati hidangan kami
+                    </p>
+                </div>
+            `;
+
+            document.getElementById('modal-struk').style.display = 'flex';
+        }
+
+        function tutupStruk() {
+            document.getElementById('modal-struk').style.display = 'none';
+        }
+
+        function cetakStruk() {
+            window.print();
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', function() {
+            renderPesanan();
+            
+            Store.onSync(() => {
+                renderPesanan();
+            });
+            
+            setInterval(renderPesanan, 3000);
+        });
+    </script>
+</body>
+</html>

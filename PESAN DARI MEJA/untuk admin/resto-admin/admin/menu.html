@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Menu - Resto Nusantara</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="admin-shell.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+    <div class="mobile-overlay" onclick="toggleMenu()"></div>
+
+    <aside class="admin-sidebar" id="sidebar">
+        <div class="admin-sidebar-brand">
+            <div class="brand-logo">
+                <svg width="24" height="24" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="22" cy="22" r="20" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
+                    <path d="M22 10 C22 10 29 15.5 29 22 C29 28.5 22 34 22 34 C22 34 15 28.5 15 22 C15 15.5 22 10 22 10Z"
+                          stroke="rgba(255,255,255,0.5)" stroke-width="1" fill="none"/>
+                    <line x1="10" y1="22" x2="34" y2="22" stroke="rgba(255,255,255,0.5)" stroke-width="0.8"/>
+                </svg>
+                <h2>Resto Nusantara</h2>
+            </div>
+            <p>Panel Admin</p>
+        </div>
+        <ul class="admin-nav">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="dapur.html">Antrian Dapur</a></li>
+            <li><a href="menu.html" class="active">Kelola Menu</a></li>
+            <li><a href="pembayaran.html">Pembayaran</a></li>
+        </ul>
+        <div class="admin-sidebar-footer">
+            <a href="../index.html">Keluar</a>
+        </div>
+    </aside>
+
+    <main class="admin-main">
+        <div class="admin-header">
+            <h1>Kelola Menu</h1>
+            <button class="btn btn-primary" onclick="bukaFormTambah()">+ Tambah Menu</button>
+        </div>
+
+        <div class="admin-content">
+            <div id="daftar-menu" class="menu-grid"></div>
+        </div>
+    </main>
+
+    <!-- Modal Form -->
+    <div class="modal-overlay" id="modal-form">
+        <div class="modal-content" style="max-width: 450px;">
+            <button class="modal-close" onclick="tutupForm()">×</button>
+            <h3 style="margin-bottom: 20px; font-family: 'Cormorant Garamond', serif;">Tambah/Edit Menu</h3>
+            
+            <!-- Preview Gambar -->
+            <div id="preview-gambar" style="width: 100%; height: 200px; background: #F0F0F0; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <span style="color: #999; font-size: 0.9rem;">📷 Pilih gambar</span>
+            </div>
+
+            <form id="form-menu" onsubmit="simpanMenu(event)">
+                <input type="hidden" id="menu-id">
+                <input type="hidden" id="menu-gambar-base64">
+                
+                <!-- Input File (Upload Langsung) -->
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85rem; color: #666; margin-bottom: 6px;">Upload Foto</label>
+                    <input type="file" id="menu-gambar-file" accept="image/*" onchange="previewFile()" 
+                           style="width: 100%; padding: 10px; border: 1px dashed #ccc; border-radius: 6px; font-family: 'Inter'; cursor: pointer;">
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85rem; color: #666; margin-bottom: 6px;">Nama Menu</label>
+                    <input type="text" id="menu-nama" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Inter';">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85rem; color: #666; margin-bottom: 6px;">Kategori</label>
+                    <select id="menu-kategori" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Inter';">
+                        <option>Makanan</option>
+                        <option>Minuman</option>
+                        <option>Dessert</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85rem; color: #666; margin-bottom: 6px;">Harga</label>
+                    <input type="number" id="menu-harga" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Inter';">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85rem; color: #666; margin-bottom: 6px;">Deskripsi</label>
+                    <textarea id="menu-deskripsi" rows="2" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Inter'; resize: vertical;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+
+        .menu-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+        }
+
+        .menu-card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .menu-card-image.placeholder {
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #388E3C;
+            font-size: 3rem;
+        }
+
+        .menu-card-body {
+            padding: 16px;
+        }
+
+        .menu-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .menu-card-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1A3A2A;
+            margin: 0;
+        }
+
+        .menu-card-kategori {
+            font-size: 0.75rem;
+            color: #888;
+            background: #F0F0F0;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .menu-card-harga {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1A3A2A;
+            margin-bottom: 8px;
+        }
+
+        .menu-card-deskripsi {
+            font-size: 0.85rem;
+            color: #888;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .menu-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #F0F0F0;
+        }
+
+        .menu-card-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .menu-card-status.tersedia {
+            background: #E8F5E9;
+            color: #388E3C;
+        }
+
+        .menu-card-status.habis {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .menu-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .menu-card-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #1A3A2A;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .menu-card-actions button:hover {
+            background: #F0F0F0;
+        }
+
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .menu-card-image {
+                height: 120px;
+            }
+
+            .menu-card-body {
+                padding: 12px;
+            }
+
+            .menu-card-title {
+                font-size: 0.9rem;
+            }
+
+            .menu-card-harga {
+                font-size: 1rem;
+            }
+
+            .menu-card-deskripsi {
+                display: none;
+            }
+        }
+    </style>
+
+    <script src="../shared/store.js"></script>
+    <script>
+        let gambarBase64 = '';
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.querySelector('.mobile-overlay').style.display = 
+                document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+        }
+
+        // ==================== PREVIEW GAMBAR ====================
+        function previewFile() {
+            const fileInput = document.getElementById('menu-gambar-file');
+            const preview = document.getElementById('preview-gambar');
+            const file = fileInput.files[0];
+
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                gambarBase64 = e.target.result;
+                preview.innerHTML = `<img src="${gambarBase64}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderMenu() {
+            const menu = Store.getMenu();
+            const container = document.getElementById('daftar-menu');
+
+            if (menu.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 60px; color: #bbb;">Belum ada menu</p>';
+                return;
+            }
+
+            container.innerHTML = menu.map(item => `
+                <div class="menu-card">
+                    ${item.gambar ? 
+                        `<img src="${item.gambar}" alt="${item.nama}" class="menu-card-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` +
+                        `<div class="menu-card-image placeholder" style="display:none;">🍽️</div>` :
+                        `<div class="menu-card-image placeholder">🍽️</div>`
+                    }
+                    <div class="menu-card-body">
+                        <div class="menu-card-header">
+                            <h3 class="menu-card-title">${item.nama}</h3>
+                            <span class="menu-card-kategori">${item.kategori}</span>
+                        </div>
+                        <div class="menu-card-harga">${formatRupiah(item.harga)}</div>
+                        <div class="menu-card-deskripsi">${item.deskripsi || ''}</div>
+                        <div class="menu-card-footer">
+                            <span class="menu-card-status ${item.tersedia ? 'tersedia' : 'habis'}">
+                                ${item.tersedia ? '✓ Tersedia' : '✗ Habis'}
+                            </span>
+                            <div class="menu-card-actions">
+                                <button onclick="editMenu('${item.id}')">Edit</button>
+                                <button onclick="toggleStatus('${item.id}')" style="color: ${item.tersedia ? '#C62828' : '#388E3C'};">
+                                    ${item.tersedia ? 'Nonaktif' : 'Aktif'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function bukaFormTambah() {
+            document.getElementById('form-menu').reset();
+            document.getElementById('menu-id').value = '';
+            gambarBase64 = '';
+            document.getElementById('preview-gambar').innerHTML = '<span style="color: #999; font-size: 0.9rem;">📷 Pilih gambar</span>';
+            document.getElementById('modal-form').style.display = 'flex';
+        }
+
+        function editMenu(id) {
+            const item = Store.getMenuById(id);
+            if (!item) return;
+            
+            document.getElementById('menu-id').value = item.id;
+            document.getElementById('menu-nama').value = item.nama;
+            document.getElementById('menu-kategori').value = item.kategori;
+            document.getElementById('menu-harga').value = item.harga;
+            document.getElementById('menu-deskripsi').value = item.deskripsi || '';
+            
+            // Tampilkan gambar yang sudah ada
+            gambarBase64 = item.gambar || '';
+            if (gambarBase64) {
+                document.getElementById('preview-gambar').innerHTML = `<img src="${gambarBase64}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            } else {
+                document.getElementById('preview-gambar').innerHTML = '<span style="color: #999; font-size: 0.9rem;">📷 Pilih gambar</span>';
+            }
+            
+            document.getElementById('modal-form').style.display = 'flex';
+        }
+
+        function tutupForm() {
+            document.getElementById('modal-form').style.display = 'none';
+            gambarBase64 = '';
+        }
+
+        function simpanMenu(e) {
+            e.preventDefault();
+            const id = document.getElementById('menu-id').value;
+            
+            const data = {
+                nama: document.getElementById('menu-nama').value,
+                kategori: document.getElementById('menu-kategori').value,
+                harga: parseInt(document.getElementById('menu-harga').value),
+                gambar: gambarBase64,
+                deskripsi: document.getElementById('menu-deskripsi').value,
+                tersedia: true
+            };
+
+            if (id) {
+                // Edit
+                const menu = Store.getMenu();
+                const item = menu.find(m => m.id === id);
+                if (item) {
+                    data.tersedia = item.tersedia; // Pertahankan status
+                    Object.assign(item, data);
+                    localStorage.setItem(STORE_KEYS.MENU, JSON.stringify(menu));
+                }
+            } else {
+                // Tambah baru
+                data.id = 'menu-' + Date.now();
+                const menu = Store.getMenu();
+                menu.push(data);
+                localStorage.setItem(STORE_KEYS.MENU, JSON.stringify(menu));
+            }
+
+            tutupForm();
+            renderMenu();
+        }
+
+        function toggleStatus(id) {
+            const menu = Store.getMenu();
+            const item = menu.find(m => m.id === id);
+            if (item) {
+                item.tersedia = !item.tersedia;
+                localStorage.setItem(STORE_KEYS.MENU, JSON.stringify(menu));
+                renderMenu();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMenu();
+            Store.onSync(() => renderMenu());
+        });
+    </script>
+</body>
+</html>
